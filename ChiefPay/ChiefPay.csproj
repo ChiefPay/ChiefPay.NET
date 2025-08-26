@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>latest</LangVersion>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <AssemblyName>ChiefPay</AssemblyName>
+        <RootNamespace>ChiefPay</RootNamespace>
+        <Description>ChiefPay C# SDK on RestSharp. Async HTTP + WebSocket clients, errors, retries, and typed DTOs.</Description>
+        <OutputType>Library</OutputType>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="RestSharp" Version="112.0.0" />
+        <PackageReference Include="SocketIOClient" Version="3.1.2" />
+    </ItemGroup>
+</Project>
