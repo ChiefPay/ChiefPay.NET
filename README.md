@@ -45,42 +45,34 @@ var invoiceRequest = new CreateInvoiceRequest
 };
 
 var createdInvoice = await client.CreateInvoiceAsync(invoiceRequest);
-Console.WriteLine($"Invoice created: {createdInvoice.Id}");
+Console.WriteLine($"Invoice created: {createdInvoice.Data.Id}");
 ```
 
 ### Invoice Management
 
 ```csharp
 // Get invoice info
-var invoice = await client.GetInvoiceAsync(createdInvoice.Id);
+var invoice = await client.GetInvoiceAsync(createdInvoice.Data.Id);
 
 // Prolongate (extend expiration)
-var prolonged = await client.ProlongateInvoiceAsync(createdInvoice.Id);
+var prolonged = await client.ProlongateInvoiceAsync(createdInvoice.Data.Id);
 
 // Cancel invoice
-await client.CancelInvoiceAsync(createdInvoice.Id);
+await client.CancelInvoiceAsync(createdInvoice.Data.Id);
 ```
 
 ### Historical Data & Rates
 
 ```csharp
 // Invoices history
-var invoicesHistory = await client.GetInvoicesHistoryAsync(new InvoicesHistoryRequest
-{
-    From = DateTimeOffset.UtcNow.AddDays(-7),
-    To   = DateTimeOffset.UtcNow
-});
+var invoicesHistory = await client.GetInvoicesHistoryAsync(DateTime.UtcNow.AddDays(-7), DateTime.UtcNow, 100);
 
 // Transactions history
-var txHistory = await client.GetTransactionsHistoryAsync(new TransactionsHistoryRequest
-{
-    From = DateTimeOffset.UtcNow.AddDays(-30),
-    To   = DateTimeOffset.UtcNow
-});
+var txHistory = await client.GetTransactionsHistoryAsync(DateTime.UtcNow.AddDays(-7), DateTime.UtcNow, 100);
 
 // Exchange rates
 var rates = await client.GetRatesAsync();
-Console.WriteLine($"Rates count: {rates.Count}");
+Console.WriteLine($"Rates count: {rates.Data.Count}");
 ```
 
 ### Wallets
@@ -89,13 +81,12 @@ Console.WriteLine($"Rates count: {rates.Count}");
 // Create wallet
 var wallet = await client.CreateWalletAsync(new CreateWalletRequest
 {
-    Currency = "USD",
-    Label    = "Primary wallet"
+      OrderId = invoice.Data.Id,
 });
 
 // Get wallet info
-var fetchedWallet = await client.GetWalletAsync(wallet.Id);
-Console.WriteLine($"Wallet balance: {fetchedWallet.Balance}");
+var fetchedWallet = await client.GetWalletAsync(wallet.Data.Id);
+Console.WriteLine($"Wallet id: {fetchedWallet.Data.Id}");
 ```
 
 ### WebSocket Client (Real-Time)
