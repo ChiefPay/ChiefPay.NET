@@ -21,13 +21,24 @@ public sealed class ChiefPayClient : IAsyncDisposable
         _http.SendAsync<Invoice>(Method.Post, "v1/invoice", req, null, ct);
 
     public Task<Invoice> CancelInvoiceAsync(CancelInvoiceRequest req, string? idempotencyKey = null,
-        CancellationToken ct = default) =>
-        _http.SendAsync<Invoice>(Method.Delete, "v1/invoice", req, null, ct);
+        CancellationToken ct = default)
+    {
+        if (req.Id == null && req.OrderId == null)
+            throw new ArgumentException("Either 'Id' or 'OrderId' must be provided.");
+
+        return _http.SendAsync<Invoice>(Method.Delete, "v1/invoice", req, null, ct);
+    }
 
     public Task<Invoice> ProlongateInvoiceAsync(ProlongateInvoiceRequest req,
         string? idempotencyKey = null,
-        CancellationToken ct = default) =>
-        _http.SendAsync<Invoice>(Method.Patch, "v1/invoice", req, null, ct);
+        CancellationToken ct = default)
+    {
+        if (req.Id == null && req.OrderId == null)
+            throw new ArgumentException("Either 'Id' or 'OrderId' must be provided.");
+
+
+        return _http.SendAsync<Invoice>(Method.Patch, "v1/invoice", req, null, ct);
+    }
 
     public Task<Invoice> GetInvoiceAsync(string invoiceId, CancellationToken ct = default) =>
         _http.SendAsync<Invoice>(Method.Get, $"v1/invoice?id={invoiceId}", null, null, ct);
@@ -56,8 +67,25 @@ public sealed class ChiefPayClient : IAsyncDisposable
         return _http.SendAsync<TransactionHistory>(Method.Get, url, null, null, ct);
     }
 
-    public Task<WalletResponse> GetWalletAsync(Guid id, Guid orderId, CancellationToken ct = default) =>
-        _http.SendAsync<WalletResponse>(Method.Get, $"/v1/wallet?id={id}&orderId={orderId}", null, null, ct);
+    public Task<WalletResponse> GetWalletAsync(string? id = null, string? orderId = null,
+        CancellationToken ct = default)
+    {
+        if (id == null && orderId == null)
+            throw new ArgumentException("Either 'id' or 'orderId' must be provided.");
+
+        var query = id != null
+            ? $"id={Uri.EscapeDataString(id)}"
+            : $"orderId={Uri.EscapeDataString(orderId!)}";
+
+        return _http.SendAsync<WalletResponse>(
+            Method.Get,
+            $"/v1/wallet?{query}",
+            null,
+            null,
+            ct
+        );
+    }
+
 
     public Task<WalletResponse> CreateWalletAsync(CreateWalletRequest req, CancellationToken ct = default) =>
         _http.SendAsync<WalletResponse>(Method.Post, "/v1/wallet", req, null, ct);
